@@ -45,103 +45,79 @@ Just by looking at these records, we can say that the second record is a duplica
 
 ## Data Challenges:
 
-With an end goal of identifying duplicates, there are two main challenges I faced in this dataset. They are (a) very messy data and (b) >50% missing data. The data, particularly in the address fields such as city, state and country is very messy. For example, a snapshot of the unique value observed in the billing address feature “country” is shown below: 
+With an end goal of identifying duplicates, there are two main challenges I faced in this dataset. They are (a) very messy data and (b) >50% missing data. 
 
+### Messy data 
+The data, particularly in the address fields such as city, state and country is very messy. For example, a snapshot of the unique value observed in the billing address feature “country” is shown below: 
 
-
+ ![](deduplicate_country_name.png)
 
 For a feature named country, we would expect the feature to contain name of the countries, for example - USA, Mexico. But, this feature, in addition to the country name, also contains other metadata such as city name, company name, phone number, email address, so on. It should be noted that even though we have separate fields for them, the data is pretty much jumbled around all the fields. 
 
-
+### >50% missing data
 The second challenge to attain our end goal of finding duplicates is - missing data. More than 50% of the data is missing in this data set. Even after data cleaning (will be explained later), only 42% of the data has non-missing values in all features. 
+
+![](deduplicate_missing_data.png)
 
 ## Approach:
 
-Considering the diverse nature of data in the three main features (name, address and phone number) together with data challenges mentioned above, I decided to create three different pipeline for each of these features to overcome these challenges.
+Considering the diverse nature of data in the three main features (name, address and phone number) together with data challenges mentioned above, I decided to create three different pipelines for each of these features to overcome these challenges. They are as follows:
 
-
-1. Data pipeline for Company name: 
+### 1. Data pipeline for company name: 
 	
-  Three columns were found for company names in the dataset - display name, fully qualified name and company name. 
+The company profile dataframe contained three features for name of the company: display name, fully qualified name and company name. 
 
-Python code here to show display name is redundant
+	Python code here to show display name is redundant
 
-	From analysis it was clear that the display name is a redudant feature, and thus, it was removed. The other two name features are retained as they provide varied information. 
-
-	After feature selection, the data is converted into vector using TF-IDF vectorization with character embedding. There are duplicates in the dataset because of spelling error, that I chose to perform character embedding. Also, lot of companies has ‘ltd’ and ‘Co’ at the end and TF-IDF gives less importance to that. 
+From analysis it was clear that the feature 'display name' is a redudant feature, and thus, it was removed. The other two name features are retained as they provide varied information. After feature selection, the data is converted into vector using TF-IDF vectorization with character embedding. There are duplicates in the dataset because of spelling error, that I chose to perform character embedding. Also, lot of companies has ‘ltd’ and ‘Co’ at the end and TF-IDF gives less importance to that. 
 	
-	Finally to find duplicate names in the dataset, cosine similarity is chosen. Note that the char embedding resulted in 300K+ features, where Euclidean distance will fail. 
+Finally to find duplicate names in the dataset, cosine similarity is chosen. Note that the char embedding resulted in 300K+ features, where Euclidean distance will fail. 
 
+### 2. Data pipeline for Billing address features:
 
+As shown before, there are 10 features available under billing address, but the data is all jumbled across features. In addition, the data is very messy. To overcome this challenges, I decided to clean all the columns and combine them into one feature and convert it into geocordinates. 
 
-**Create a free website with Academic using Markdown, Jupyter, or RStudio. Choose a beautiful color theme and build anything with the Page Builder - over 40 _widgets_, _themes_, and _language packs_ included!**
+	Data cleaning:
+		- Removing punctuations
+		- Removing company names
+		- Removing people names
+		- Removing emails address
+		- Removing phone/fax numbers
+After data cleaning and combining all columns, the address becomes
 
-[Check out the latest **demo**](https://academic-demo.netlify.com/) of what you'll get in less than 10 minutes, or [view the **showcase**](https://sourcethemes.com/academic/#expo) of personal, project, and business sites.
+Now, the cleaned address is converted into geo co-ordinates (latitude and longitude). For this, I utilized geopy together with bing maps. So, the address now becomes
 
-- 👉 [**Get Started**](#install)
-- 📚 [View the **documentation**](https://sourcethemes.com/academic/docs/)
-- 💬 [**Ask a question** on the forum](https://discourse.gohugo.io)
-- 👥 [Chat with the **community**](https://spectrum.chat/academic)
-- 🐦 Twitter: [@source_themes](https://twitter.com/source_themes) [@GeorgeCushen](https://twitter.com/GeorgeCushen) [#MadeWithAcademic](https://twitter.com/search?q=%23MadeWithAcademic&src=typd)
-- 💡 [Request a **feature** or report a **bug**](https://github.com/gcushen/hugo-academic/issues)
-- ⬆️ **Updating?** View the [Update Guide](https://sourcethemes.com/academic/docs/update/) and [Release Notes](https://sourcethemes.com/academic/updates/)
-- :heart: **Support development** of Academic:
-  - ☕️ [**Donate a coffee**](https://paypal.me/cushen)
-  - 💵 [Become a backer on **Patreon**](https://www.patreon.com/cushen)
-  - 🖼️ [Decorate your laptop or journal with an Academic **sticker**](https://www.redbubble.com/people/neutreno/works/34387919-academic)
-  - 👕 [Wear the **T-shirt**](https://academic.threadless.com/)
-  - :woman_technologist: [**Contribute**](https://sourcethemes.com/academic/docs/contribute/)
+	
+Show schematic of address as is, then clean address, then geo-coordinates
 
-{{< figure src="https://raw.githubusercontent.com/gcushen/hugo-academic/master/academic.png" title="Academic is mobile first with a responsive design to ensure that your site looks stunning on every device." >}}
+Finally, Haversine distance was used to calculate the distance between two geo-coordinates in miles and cut off of 1 mile was used. If the distance calculates is less than 1 mile, address is a match. 
 
-**Key features:**
+### 3. Data pipeline for phone numbers
 
-- **Page builder** - Create *anything* with [**widgets**](https://sourcethemes.com/academic/docs/page-builder/) and [**elements**](https://sourcethemes.com/academic/docs/writing-markdown-latex/)
-- **Edit any type of content** - Blog posts, publications, talks, slides, projects, and more!
-- **Create content** in [**Markdown**](https://sourcethemes.com/academic/docs/writing-markdown-latex/), [**Jupyter**](https://sourcethemes.com/academic/docs/jupyter/), or [**RStudio**](https://sourcethemes.com/academic/docs/install/#install-with-rstudio)
-- **Plugin System** - Fully customizable [**color** and **font themes**](https://sourcethemes.com/academic/themes/)
-- **Display Code and Math** - Code highlighting and [LaTeX math](https://en.wikibooks.org/wiki/LaTeX/Mathematics) supported
-- **Integrations** - [Google Analytics](https://analytics.google.com), [Disqus commenting](https://disqus.com), Maps, Contact Forms, and more!
-- **Beautiful Site** - Simple and refreshing one page design
-- **Industry-Leading SEO** - Help get your website found on search engines and social media
-- **Media Galleries** - Display your images and videos with captions in a customizable gallery
-- **Mobile Friendly** - Look amazing on every screen with a mobile friendly version of your site
-- **Multi-language** - 15+ language packs including English, 中文, and Português
-- **Multi-user** - Each author gets their own profile page
-- **Privacy Pack** - Assists with GDPR
-- **Stand Out** - Bring your site to life with animation, parallax backgrounds, and scroll effects
-- **One-Click Deployment** - No servers. No databases. Only files.
+Data was cleaned to convert all phone number into one format. The extensions are also removed from the phone number and the phone numbers were compared directly with each other. Here the metric was set to 1 whenever the phone number matches and 0 when it is not. 
 
-## Themes
+Final custom metric - Dupe score:
 
-Academic comes with **automatic day (light) and night (dark) mode** built-in. Alternatively, visitors can  choose their preferred mode - click the sun/moon icon in the top right of the [Demo](https://academic-demo.netlify.com/) to see it in action! Day/night mode can also be disabled by the site admin in `params.toml`.
+The three data pipeline for three features - company names, address and phone number creates 3 metrics. All these three metrics are combined together in one metric called Dupe score. This dupe score ranges from 0 to 1 and quantifies whether a record is duplicate or not. The dupe score is calculated as follows:
 
-[Choose a stunning **theme** and **font**](https://sourcethemes.com/academic/themes/) for your site. Themes are fully [customizable](https://sourcethemes.com/academic/docs/customization/#custom-theme).
+Case (1): Weighted average of name, address and phone number
+Case (2): Weighted average of name and phone number
+Case (3): Weighted average of name and address
+Case (4): Names score
 
-## Ecosystem
+Because the data has >50% missing, one dupe score ideation is not possible, and has o be customized for records with varying missing features. 
 
-* **[Academic Admin](https://github.com/sourcethemes/academic-admin):** An admin tool to import publications from BibTeX or import assets for an offline site
-* **[Academic Scripts](https://github.com/sourcethemes/academic-scripts):** Scripts to help migrate content to new versions of Academic
+## Evaluation
 
-## Install
+Evaluating a model or performance is very crucial, particularly for unsupervised setting like this situation. To check the performance, I created a validation dataset by randomly sampling 100 records from the data and introducing different types of duplicates to them as below:
 
-You can choose from one of the following four methods to install:
+Exact duplicate
+Duplicates with spelling error
+Duplicates with reversed word order of the name
 
-* [**one-click install using your web browser (recommended)**](https://sourcethemes.com/academic/docs/install/#install-with-web-browser)
-* [install on your computer using **Git** with the Command Prompt/Terminal app](https://sourcethemes.com/academic/docs/install/#install-with-git)
-* [install on your computer by downloading the **ZIP files**](https://sourcethemes.com/academic/docs/install/#install-with-zip)
-* [install on your computer with **RStudio**](https://sourcethemes.com/academic/docs/install/#install-with-rstudio)
+Altogether, I generated about 800 duplicate records and combined together with the original dataset and ran the model on this data. The model was run at different cut-off of Dupe score - 0.6 - 1 at a frequency of 0.5. The resulting precision-recall curve is shown below:
 
-Then [personalize and deploy your new site](https://sourcethemes.com/academic/docs/get-started/).
+At a 0.7 Dupe cut off score, F1-score of 0.96 was obtained, which is pretty descent. 
 
-## Updating
+Now looking at the same example after running through the model, the model identified the duplicate with a Dupe score of 0.8. The model also provides scores for the three main features, which provides interpretability of the score. 
 
-[View the Update Guide](https://sourcethemes.com/academic/docs/update/).
-
-Feel free to *star* the project on [Github](https://github.com/gcushen/hugo-academic/) to help keep track of [updates](https://sourcethemes.com/academic/updates).
-
-## License
-
-Copyright 2016-present [George Cushen](https://georgecushen.com).
-
-Released under the [MIT](https://github.com/gcushen/hugo-academic/blob/master/LICENSE.md) license.
