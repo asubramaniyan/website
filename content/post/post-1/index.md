@@ -1,7 +1,7 @@
 ---
 title: 'Super De-Duper: Identifying duplicates in messy data'
-subtitle: 
-summary: Super De-Duper is the data product I built in 4 weeks during the insight data science fellowship
+subtitle: Super De-Duper is the data product I built in 4 weeks during the insight data science fellowship 
+summary: 
 authors:
 
 tags:
@@ -32,7 +32,7 @@ projects: []
 ---
 
 
-As we data scientist know, the quality of the data can make or break a data product. Poor quality data has led to a loss of ~600B US dollars just in the field of marketing alone. Another report cuts duplicate data as the mother of all data quality problems. Duplicate data issues are faced by many companies whose customers are B2B companies. They get their data from different CRMs and accounting systems which has data in different formats. Duplicate records when not removed can negatively affect data products such as customer analytics - customer segmentation analysis, in the worst case can led the same customer to be in several tiers. The goal of Super De-Duper is to identify duplicates records and provide a “Dupe” score, a custom metric that quantifies the duplicity of the records. 
+As we data scientists know, the quality of the data can make or break a data product. Poor quality data has led to a loss of ~600B US dollars just in the field of marketing alone [1]. Another report cites duplicate data as the mother of all data quality problems [2]. Duplicate data issues are faced by many companies,  who has their data collected from different CRM platforms and accounting systems as the data in these platforms come in different formats. Duplicate records when not removed can negatively affect data products. For example, customer segmentation analysis can report the same customer segmented into multiple tiers when the duplicate records are not removed. The goal of Super De-Duper project is to identify duplicates records and provide a “Dupe” score, a custom metric that quantifies the duplicity of the records. 
 
 I consulted with a startup company in Boston, Tally Street, who provide virtual accountant services to B2B companies and worked on their customer profile data to remove duplicates. The main features of the data that I used for this project are: name of the company, their address and primary phone number. There are several duplicates in the dataset, one example is shown below:
 
@@ -41,7 +41,7 @@ I consulted with a startup company in Boston, Tally Street, who provide virtual 
 | Curtis Corrado Insurance Agency (deleted) | Curtis Corrado Insurance Agency | 5975 S Quebec St. | Suite 209 | Centennial | CO | 80111 | (303) 220-7688 |
 | Curtis Corrado Insurance Agency | Farmers Insurance-Curt Corrado Agency | 5975 S Quebec St | #209 | Centennial | CO | 80111 | 3032207688 |
 
-Just by looking at these records, we can say that the second record is a duplicate of the first, but this is not an easy task for computer.
+Just by looking at these records, we can say that the second record is a duplicate of the first, but this is not an easy task for computer. So, the goal here is to create an algorithm to identify duplicates.
 
 ## Data Challenges:
 
@@ -65,7 +65,7 @@ Considering the diverse nature of data in the three main features (name, address
 
 ### 1. Data pipeline for company name: 
 	
-The company profile dataframe contained three features for name of the company: display name, fully qualified name and company name. 
+The company profile dataframe contained three features for the name of the company: display name, fully qualified name and company name. 
 
 	Python code here to show display name is redundant
 
@@ -75,7 +75,7 @@ Finally to find duplicate names in the dataset, cosine similarity is chosen. Not
 
 ### 2. Data pipeline for Billing address features:
 
-As shown before, there are 10 features available under billing address, but the data is all jumbled across features. In addition, the data is very messy. To overcome this challenges, I decided to clean all the columns and combine them into one feature and convert it into geocordinates. 
+As shown before, there are 10 features available under billing address, but the data present in these fields are very messy (all jumbled across features). To overcome this challenge, I decided to clean all the columns and combine them into one feature and convert it into geocordinates. 
 
 	Data cleaning:
 		- Removing punctuations
@@ -96,9 +96,9 @@ Finally, Haversine distance was used to calculate the distance between two geo-c
 
 Data was cleaned to convert all phone number into one format. The extensions are also removed from the phone number and the phone numbers were compared directly with each other. Here the metric was set to 1 whenever the phone number matches and 0 when it is not. 
 
-Final custom metric - Dupe score:
+## Defining the custom metric, Dupe score:
 
-The three data pipeline for three features - company names, address and phone number creates 3 metrics. All these three metrics are combined together in one metric called Dupe score. This dupe score ranges from 0 to 1 and quantifies whether a record is duplicate or not. The dupe score is calculated as follows:
+The three data pipeline for the features - company names, address and phone number creates 3 metrics. All these three metrics are combined together in one metric called Dupe score. This dupe score ranges from 0 to 1 and quantifies whether a record is duplicate or not. The dupe score is calculated as follows:
 
 Case (1): Weighted average of name, address and phone number
 Case (2): Weighted average of name and phone number
@@ -120,4 +120,11 @@ Altogether, I generated about 800 duplicate records and combined together with t
 At a 0.7 Dupe cut off score, F1-score of 0.96 was obtained, which is pretty descent. 
 
 Now looking at the same example after running through the model, the model identified the duplicate with a Dupe score of 0.8. The model also provides scores for the three main features, which provides interpretability of the score. 
+
+
+## References:
+
+1. 
+2. https://dzone.com/articles/dirty-disparate-duplicated-data-how-to-stop-the-3
+
 
