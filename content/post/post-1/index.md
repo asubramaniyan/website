@@ -1,15 +1,15 @@
 ---
-title: 'Academic: the website builder for Hugo'
-subtitle: 'Create a beautifully simple website in under 10 minutes :rocket:'
-summary: Create a beautifully simple website in under 10 minutes.
+title: 'Super De-Duper: Identifying duplicates in messy data'
+subtitle: 
+summary: Super De-Duper is the data product I built in 4 weeks during the insight data science fellowship
 authors:
 
 tags:
 - Academic
 
 categories:
-date: "2016-04-20T00:00:00Z"
-lastmod: "2019-04-17T00:00:00Z"
+date: 
+lastmod: 
 featured: false
 draft: false
 
@@ -30,6 +30,15 @@ image:
 #   Otherwise, set `projects = []`.
 projects: []
 ---
+
+
+As we data scientist know, the quality of the data can make or break a data product. Poor quality data has led to a loss of ~600B US dollars just in the field of marketing alone. Another report cuts duplicate data as the mother of all data quality problems. Duplicate data issues are faced by many companies whose customers are B2B companies. They get their data from different CRMs and accounting systems which has data in different formats. Duplicate records when not removed can negatively affect data products such as customer analytics - customer segmentation analysis, in the worst case can led the same customer to be in several tiers. The goal of Super De-Duper is to identify duplicates records and provide a “Dupe” score, a custom metric that quantified the duplicity of the records. 
+
+I consulted with a startup company in Boston, Tally Street, who provide virtual accountant services to B2B companies and worked on their customer profile data to remove duplicates. The main features of the data that I used for this project are: name of the company, their address and primary phone number. There are several duplicates in the dataset, one example is shown below:
+
+
+
+
 
 **Create a free website with Academic using Markdown, Jupyter, or RStudio. Choose a beautiful color theme and build anything with the Page Builder - over 40 _widgets_, _themes_, and _language packs_ included!**
 
