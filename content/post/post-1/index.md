@@ -131,6 +131,14 @@ The same records we referred at the beginning of the blog post when passed throu
 | 1 | 1 | 1 | 1 | curtis corrado insurance agency | (0.6912930819093975, -1.8309467973299316) | 3032207688 |
 | **0.89** | 0.682 | 1 | 1 | farmers insurance-curt corrado agency | (0.6912930819093975, -1.8309467973299316) | 3032207688 |
 
+## Python package + REST API:
+
+I have created a python package called deduplicates which identifies duplicates records through the logic mentioned above. 
+
+Tally Street, the company I worked with a java script shop. My codebase is in python. In order for them to use my code in java script environment, I created a REST API using Flask in python. Now, they can access my code from java script through this API. Basically, the java script code will send the record number for which they need duplicates through API to the python package. The find_duplicates module in the python package identifies the duplicate records and sends the duplicate record IDs and the score back to the java script through API.
+
+![](deduplicate_deliverable)
+
 
 ## References:
 
