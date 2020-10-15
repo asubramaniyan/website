@@ -32,7 +32,7 @@ projects: []
 ---
 
 
-As we data scientists know, the quality of the data can make or break a data product. Poor quality data has led to a loss of ~600B US dollars just in the field of marketing alone [1]. Another report cites duplicate data as the mother of all data quality problems [2]. Duplicate data issues are faced by many companies,  who has their data collected from different CRM platforms and accounting systems as the data in these platforms come in different formats. Duplicate records when not removed can negatively affect data products. For example, customer segmentation analysis can report the same customer segmented into multiple tiers when the duplicate records are not removed. The goal of Super De-Duper project is to identify duplicates records and provide a “Dupe” score, a custom metric that quantifies the duplicity of the records. 
+As we data scientists know, the quality of the data can make or break a data product. Poor quality data has led to a loss of ~611B US dollars per year just in the field of marketing alone [1]. Another report cites duplicate data as the mother of all data quality problems [2]. Duplicate data issues are faced by many companies,  who has their data collected from different CRM platforms and accounting systems as the data in these platforms come in different formats. Duplicate records when not removed can negatively affect data products. For example, customer segmentation analysis can report the same customer segmented into multiple tiers when the duplicate records are not removed. The goal of Super De-Duper project is to identify duplicates records and provide a “Dupe” score, a custom metric that quantifies the duplicity of the records. 
 
 I consulted with a startup company in Boston, Tally Street, who provide virtual accountant services to B2B companies and worked on their customer profile data to remove duplicates. The main features of the data that I used for this project are: name of the company, their address and primary phone number. There are several duplicates in the dataset, one example is shown below:
 
@@ -45,7 +45,7 @@ Just by looking at these records, we can say that the second record is a duplica
 
 ## Data Challenges:
 
-With an end goal of identifying duplicates, there are two main challenges I faced in this dataset. They are (a) very messy data and (b) >50% missing data. 
+The two main challenges that I faced in this dataset are (a) very messy data and (b) >50% missing data. 
 
 ### Messy data 
 The data, particularly in the address fields such as city, state and country is very messy. For example, a snapshot of the unique value observed in the billing address feature “country” is shown below: 
@@ -65,11 +65,11 @@ Considering the diverse nature of data in the three main features (name, address
 
 ### 1. Data pipeline for company name: 
 	
-The company profile dataframe contained three features for the name of the company: display name, fully qualified name and company name. 
+The company profile data set had three features for the name of the company: display name, fully qualified name and company name. From analysis it was clear that the feature 'display name' is a redudant feature, and thus, it was removed. The other two name features are retained as they provide varied information. 
 
 	Python code here to show display name is redundant
 
-From analysis it was clear that the feature 'display name' is a redudant feature, and thus, it was removed. The other two name features are retained as they provide varied information. After feature selection, the data is converted into vector using TF-IDF vectorization with character embedding. There are duplicates in the dataset because of spelling error, that I chose to perform character embedding. Also, lot of companies has ‘ltd’ and ‘Co’ at the end and TF-IDF gives less importance to that. 
+After feature selection, the data is converted into vector using TF-IDF vectorization with character embedding. There are duplicates in the dataset because of spelling error, that I chose to perform character embedding. Also, lot of companies has ‘ltd’ and ‘Co’ at the end and TF-IDF gives less importance to that. 
 	
 Finally to find duplicate names in the dataset, cosine similarity is chosen. Note that the char embedding resulted in 300K+ features, where Euclidean distance will fail. 
 
@@ -109,22 +109,32 @@ Because the data has >50% missing, one dupe score ideation is not possible, and 
 
 ## Evaluation
 
-Evaluating a model or performance is very crucial, particularly for unsupervised setting like this situation. To check the performance, I created a validation dataset by randomly sampling 100 records from the data and introducing different types of duplicates to them as below:
+Evaluating the model for performance is very crucial, particularly for unsupervised setting where labeled data is not available. To check the model's performance, I created a validation dataset by randomly sampling 100 records from the data and introduced different types of duplicates as below:
 
-Exact duplicate
-Duplicates with spelling error
-Duplicates with reversed word order of the name
+	Original record: Curtis Corrado Insurance Agency
+	Exact duplicate: Curtis Corrado Insurance Agency
+	Duplicates with spelling error: Curt**e**s Corrado Insurance Agency, Curtis C**a**rrado Insurance Agency
+	Duplicates with reversed word order of the name: Agency Insurance Corrado Curtis
 
-Altogether, I generated about 800 duplicate records and combined together with the original dataset and ran the model on this data. The model was run at different cut-off of Dupe score - 0.6 - 1 at a frequency of 0.5. The resulting precision-recall curve is shown below:
+All of these duplicate records were created with and without address. Altogether, I generated about 800 duplicate records and combined them with the original dataset and ran the model on this data. The model was run at different cut-off of Dupe score - 0.6 - 1 at a frequency of 0.5. The resulting precision-recall curve is shown below:
+
+ ![](deduplicate_precision_recall.png)
 
 At a 0.7 Dupe cut off score, F1-score of 0.96 was obtained, which is pretty descent. 
 
-Now looking at the same example after running through the model, the model identified the duplicate with a Dupe score of 0.8. The model also provides scores for the three main features, which provides interpretability of the score. 
+## Results
+
+The same records we referred at the beginning of the blog post when passed through the model identifies the duplicate record with a dupe score of 0.89.  The model also provides scores for the three main features, which provides interpretability for the Dupe score. 
+
+| Dupe score | names score | Address score | Phone score | Company name | Geo co-ordinates | Phone number |
+| ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |
+| 1 | 1 | 1 | 1 | curtis corrado insurance agency | (0.6912930819093975, -1.8309467973299316) | 3032207688 |
+| **0.89** | 0.682 | 1 | 1 | farmers insurance-curt corrado agency | (0.6912930819093975, -1.8309467973299316) | 3032207688 |
 
 
 ## References:
 
-1. 
+1. https://cognitiveseo.com/blog/13094/poor-marketing-data/
 2. https://dzone.com/articles/dirty-disparate-duplicated-data-how-to-stop-the-3
 
 
