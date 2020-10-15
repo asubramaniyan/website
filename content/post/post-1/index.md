@@ -32,11 +32,45 @@ projects: []
 ---
 
 
-As we data scientist know, the quality of the data can make or break a data product. Poor quality data has led to a loss of ~600B US dollars just in the field of marketing alone. Another report cuts duplicate data as the mother of all data quality problems. Duplicate data issues are faced by many companies whose customers are B2B companies. They get their data from different CRMs and accounting systems which has data in different formats. Duplicate records when not removed can negatively affect data products such as customer analytics - customer segmentation analysis, in the worst case can led the same customer to be in several tiers. The goal of Super De-Duper is to identify duplicates records and provide a “Dupe” score, a custom metric that quantified the duplicity of the records. 
+As we data scientist know, the quality of the data can make or break a data product. Poor quality data has led to a loss of ~600B US dollars just in the field of marketing alone. Another report cuts duplicate data as the mother of all data quality problems. Duplicate data issues are faced by many companies whose customers are B2B companies. They get their data from different CRMs and accounting systems which has data in different formats. Duplicate records when not removed can negatively affect data products such as customer analytics - customer segmentation analysis, in the worst case can led the same customer to be in several tiers. The goal of Super De-Duper is to identify duplicates records and provide a “Dupe” score, a custom metric that quantifies the duplicity of the records. 
 
 I consulted with a startup company in Boston, Tally Street, who provide virtual accountant services to B2B companies and worked on their customer profile data to remove duplicates. The main features of the data that I used for this project are: name of the company, their address and primary phone number. There are several duplicates in the dataset, one example is shown below:
 
+| Full name      | Company name | Address line1 | Address line 2 | City | State | Zipcode | Phone number |
+| ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |
+| Curtis Corrado Insurance Agency (deleted) | Curtis Corrado Insurance Agency | 5975 S Quebec St. | Suite 209 | Centennial | CO | 80111 | (303) 220-7688 |
+| Curtis Corrado Insurance Agency | Farmers Insurance-Curt Corrado Agency | 5975 S Quebec St | #209 | Centennial | CO | 80111 | 3032207688 |
 
+Just by looking at these records, we can say that the second record is a duplicate of the first, but this is not an easy task for computer.
+
+## Data Challenges:
+
+With an end goal of identifying duplicates, there are two main challenges I faced in this dataset. They are (a) very messy data and (b) >50% missing data. The data, particularly in the address fields such as city, state and country is very messy. For example, a snapshot of the unique value observed in the billing address feature “country” is shown below: 
+
+
+
+
+For a feature named country, we would expect the feature to contain name of the countries, for example - USA, Mexico. But, this feature, in addition to the country name, also contains other metadata such as city name, company name, phone number, email address, so on. It should be noted that even though we have separate fields for them, the data is pretty much jumbled around all the fields. 
+
+
+The second challenge to attain our end goal of finding duplicates is - missing data. More than 50% of the data is missing in this data set. Even after data cleaning (will be explained later), only 42% of the data has non-missing values in all features. 
+
+## Approach:
+
+Considering the diverse nature of data in the three main features (name, address and phone number) together with data challenges mentioned above, I decided to create three different pipeline for each of these features to overcome these challenges.
+
+
+1. Data pipeline for Company name: 
+	
+  Three columns were found for company names in the dataset - display name, fully qualified name and company name. 
+
+Python code here to show display name is redundant
+
+	From analysis it was clear that the display name is a redudant feature, and thus, it was removed. The other two name features are retained as they provide varied information. 
+
+	After feature selection, the data is converted into vector using TF-IDF vectorization with character embedding. There are duplicates in the dataset because of spelling error, that I chose to perform character embedding. Also, lot of companies has ‘ltd’ and ‘Co’ at the end and TF-IDF gives less importance to that. 
+	
+	Finally to find duplicate names in the dataset, cosine similarity is chosen. Note that the char embedding resulted in 300K+ features, where Euclidean distance will fail. 
 
 
 
