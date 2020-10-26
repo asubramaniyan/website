@@ -4,9 +4,6 @@ subtitle: Super De-Duper is the data product I built in 4 weeks during the insig
 summary: 
 authors:
 
-tags:
-- Academic
-
 categories:
 date: 
 lastmod: 
