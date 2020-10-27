@@ -1,14 +1,6 @@
 ---
 title: 'Super De-Duper: Identifying duplicates in messy data'
 subtitle: Super De-Duper is the data product I built in 4 weeks during the insight data science fellowship 
-summary: 
-authors:
-
-categories:
-date: 
-lastmod: 
-featured: false
-draft: false
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
